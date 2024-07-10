@@ -7,6 +7,8 @@ import 'package:reqres/common_widget/custom_text.dart';
 import 'package:reqres/theme_manager/color_manager.dart';
 import 'package:reqres/theme_manager/font_family_manager.dart';
 import 'package:reqres/theme_manager/space_manager.dart';
+import 'package:flutter/services.dart';
+import 'package:textfield_tags/textfield_tags.dart';
 
 class InterestScreen extends StatefulWidget {
   const InterestScreen({super.key});
@@ -18,11 +20,49 @@ class InterestScreen extends StatefulWidget {
 class _InterestScreenState extends State<InterestScreen> {
   final TextEditingController controller = TextEditingController();
   List<String> items = [];
+  final maxWidth = double.infinity;
+  final flex = 8;
+  late double _distanceToField;
+  final _stringTagController = StringTagController();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _distanceToField = MediaQuery.of(context).size.width;
+  }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _stringTagController = StringTagController();
+  // }
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(_moveCursorToEnd);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.removeListener(_moveCursorToEnd);
+    _stringTagController.dispose();
+  }
+
+  void _moveCursorToEnd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      int textLength = controller.text.length;
+      controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: textLength),
+      );
+    });
+  }
 
   void _addItem(String text) {
     if (text.isNotEmpty) {
       setState(() {
         items.add(text);
+
         controller.clear();
       });
     }
@@ -65,63 +105,61 @@ class _InterestScreenState extends State<InterestScreen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     35.0.spaceY,
-                    Container(
-                      constraints: const BoxConstraints(
-                          maxHeight: double.infinity,
-                          maxWidth: double.infinity),
-                      decoration: BoxDecoration(
-                          color: ColorManager.whiteWithOpacity4,
-                          borderRadius: BorderRadius.circular(9)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: items.isEmpty ? 0 : 2,
-                                  child: Wrap(
+                    TextField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                            filled: true,
+                            fillColor: ColorManager.whiteWithOpacity4,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9.0),
+                                borderSide: BorderSide.none),
+                            prefixIconConstraints: const BoxConstraints(
+                              maxWidth: double.infinity,
+                            ),
+                            prefixIcon: items.isNotEmpty
+                                ? Wrap(
+                                    // direction: Axis.horizontal,
                                     spacing: 4.0,
                                     runSpacing: 4.0,
                                     children: items.map((item) {
                                       int index = items.indexOf(item);
-                                      return SizedBox(
-                                        child: Card(
-                                          color: ColorManager.bg3,
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(item),
-                                              IconButton(
-                                                icon: Icon(Icons.delete),
-                                                onPressed: () =>
-                                                    _removeItem(index),
+                                      return Card(
+                                        color: ColorManager.whiteWithOpacity9,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4)),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                item,
+                                                style: whiteTextStyle1.copyWith(
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w600),
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: ColorManager.white,
+                                              ),
+                                              onPressed: () =>
+                                                  _removeItem(index),
+                                            ),
+                                          ],
                                         ),
                                       );
                                     }).toList(),
-                                  ),
-                                ),
-                                SizedBox(width: 1),
-                                Expanded(
-                                  flex: items.isEmpty ? 8 : 2,
-                                  child: TextField(
-                                    controller: controller,
-                                    decoration: InputDecoration(
-                                      labelText: 'Enter item',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    onSubmitted: _addItem,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                                  )
+                                : null),
+                        onSubmitted: (value) {
+                          _moveCursorToEnd();
+                          _addItem(value);
+                        }),
                   ],
                 ),
               ),

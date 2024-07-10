@@ -35,6 +35,7 @@ class ColorManager {
   static Color whiteWithOpacity7 = HexColor.fromHex('#FFFFFF').withOpacity(0.3);
   static Color whiteWithOpacity8 =
       HexColor.fromHex('#FFFFFF').withOpacity(0.22);
+  static Color whiteWithOpacity9 = HexColor.fromHex("FFFFFF").withOpacity(0.1);
   static LinearGradient btnPrimary = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
