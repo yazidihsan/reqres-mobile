@@ -13,10 +13,12 @@ class CustomAppbar extends StatelessWidget {
       this.leftIcon,
       this.rightIcon,
       this.rightTitle,
-      this.style});
+      this.style,
+      this.onPressRightSide});
 
   final IconData? leftIcon;
   final VoidCallback? onPressed;
+  final VoidCallback? onPressRightSide;
   final String title;
   final String? centerTitle;
   final IconData? rightIcon;
@@ -63,6 +65,7 @@ class CustomAppbar extends StatelessWidget {
                 type: 'bluesky',
                 text: rightTitle!,
                 isBottom: false,
+                onPressed: onPressRightSide,
               ),
       ],
     );

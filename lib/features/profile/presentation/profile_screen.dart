@@ -9,18 +9,24 @@ import 'package:reqres/common_widget/custom_appbar.dart';
 import 'package:reqres/common_widget/custom_bg_page.dart';
 import 'package:reqres/common_widget/custom_card.dart';
 import 'package:reqres/common_widget/custom_text_button.dart';
+import 'package:reqres/features/profile/presentation/interest_screen.dart';
 import 'package:reqres/features/profile/widget/button_add.dart';
 import 'package:reqres/features/profile/widget/edit_form.dart';
 import 'package:reqres/features/profile/widget/inner_shadow.dart';
 import 'package:reqres/features/profile/widget/rounded_card.dart';
 import 'package:reqres/features/profile/widget/updated_about.dart';
+import 'package:reqres/sl.dart';
 import 'package:reqres/theme_manager/font_family_manager.dart';
 import 'package:reqres/theme_manager/space_manager.dart';
 import 'package:image/image.dart' as img;
 import 'dart:typed_data';
 
+import 'package:reqres/utils/shared_pref.dart';
+
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.data});
+
+  final ScreenData? data;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -45,6 +51,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    final SharedPref pref = sl<SharedPref>();
+    log('token : ${pref.getAccessToken()}');
   }
 
   Future<void> pickAndResizeImage() async {
@@ -115,6 +123,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     leftIcon: Icons.arrow_back_ios,
                     rightIcon: Icons.more_horiz_rounded,
                     onPressed: () {
+                      final SharedPref pref = sl<SharedPref>();
+                      pref.clearAccessToken();
                       GoRouter.of(context).goNamed('login');
                     },
                   ),
@@ -220,10 +230,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             33.0.spaceY,
-                            Text(
-                              "Add in your your to help others know you better",
-                              style: whiteTextStyle2.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.w800),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Add in your your to help others know you better",
+                                  style: whiteTextStyle2.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800),
+                                ),
+                              ],
                             )
                           ]))
                       : stateVisible == 'edit'
@@ -425,19 +441,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     SvgPicture.asset('assets/icon/edit.svg')),
                           ],
                         ),
-                        28.0.spaceY,
+                        (widget.data != null) &&
+                                (widget.data!.message == 'from-interest')
+                            ? 24.0.spaceY
+                            : 28.0.spaceY,
                         Padding(
                           padding: const EdgeInsets.only(bottom: 6),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Add in your interest to find a better match",
-                                style: whiteTextStyle2.copyWith(
-                                    fontSize: 14, fontWeight: FontWeight.w800),
-                              ),
-                            ],
-                          ),
+                          child: (widget.data != null) &&
+                                  (widget.data!.message == 'from-interest')
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Wrap(
+                                        runSpacing: 4.0,
+                                        spacing: 4.0,
+                                        children:
+                                            widget.data!.items.map((item) {
+                                          return RoundedCard(text: item);
+                                        }).toList()),
+                                  ],
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Add in your interest to find a better match",
+                                      style: whiteTextStyle2.copyWith(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ])),
                 ],

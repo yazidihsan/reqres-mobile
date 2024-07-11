@@ -1,10 +1,11 @@
 import 'package:flutter/widgets.dart';
 
 import 'package:go_router/go_router.dart';
-import 'package:reqres/features/auth/presentation/login_screen.dart';
-import 'package:reqres/features/auth/presentation/register_screen.dart';
+import 'package:reqres/features/auth/presentation/screen/login_screen.dart';
+import 'package:reqres/features/auth/presentation/screen/register_screen.dart';
 import 'package:reqres/features/profile/presentation/interest_screen.dart';
 import 'package:reqres/features/profile/presentation/profile_screen.dart';
+import 'package:reqres/features/splash/presentation/screen/splash_screen.dart';
 
 class RoutesService {
   static CustomTransitionPage _buildPageWithDefaultTransition(
@@ -23,26 +24,34 @@ class RoutesService {
       );
 
   static GoRouter goRouter = GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     routes: [
       GoRoute(
-          path: '/login',
-          name: 'login',
+          path: '/splash',
+          name: 'splash',
           pageBuilder: (context, state) =>
-              _buildPageWithDefaultTransition(child: const LoginScreen()),
+              _buildPageWithDefaultTransition(child: const SplashScreen()),
           routes: [
+            GoRoute(
+                path: 'login',
+                name: 'login',
+                pageBuilder: (context, state) =>
+                    _buildPageWithDefaultTransition(
+                        child: const LoginScreen())),
             GoRoute(
                 path: 'register',
                 name: 'register',
                 pageBuilder: (context, state) =>
                     _buildPageWithDefaultTransition(
-                        child: const RegisterScreen()))
+                        child: const RegisterScreen())),
           ]),
       GoRoute(
           path: '/profile',
           name: 'profile',
-          pageBuilder: (context, state) =>
-              _buildPageWithDefaultTransition(child: const ProfileScreen()),
+          pageBuilder: (context, state) => _buildPageWithDefaultTransition(
+                  child: ProfileScreen(
+                data: state.extra as ScreenData?,
+              )),
           routes: [
             GoRoute(
               path: 'interest',

@@ -10,14 +10,18 @@ class CustomInput extends StatelessWidget {
       required this.keyboardType,
       required this.obscureText,
       this.prefixIcon,
-      this.suffixIcon});
+      this.suffixIcon,
+      this.validator,
+      this.textInputAction});
 
   final String hintText;
   final TextEditingController controller;
   final TextInputType keyboardType;
+  final TextInputAction? textInputAction;
   final bool obscureText;
   final Icon? prefixIcon;
   final Widget? suffixIcon;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +37,7 @@ class CustomInput extends StatelessWidget {
             controller: controller,
             keyboardType: keyboardType,
             obscureText: obscureText,
+            textInputAction: textInputAction,
             style: whiteTextStyle1.copyWith(fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               contentPadding:
@@ -45,6 +50,7 @@ class CustomInput extends StatelessWidget {
               focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
             ),
+            validator: validator,
           ),
         ),
       ],

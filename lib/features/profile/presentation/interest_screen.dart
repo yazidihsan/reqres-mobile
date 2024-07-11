@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reqres/common_widget/chip_input.dart';
 import 'package:reqres/common_widget/custom_appbar.dart';
 import 'package:reqres/common_widget/custom_bg_page.dart';
-import 'package:reqres/common_widget/custom_input_list.dart';
+import 'package:reqres/common_widget/custom_tags.dart';
 import 'package:reqres/common_widget/custom_text.dart';
-import 'package:reqres/theme_manager/color_manager.dart';
 import 'package:reqres/theme_manager/font_family_manager.dart';
 import 'package:reqres/theme_manager/space_manager.dart';
-import 'package:flutter/services.dart';
-import 'package:textfield_tags/textfield_tags.dart';
 
 class InterestScreen extends StatefulWidget {
   const InterestScreen({super.key});
@@ -22,20 +20,7 @@ class _InterestScreenState extends State<InterestScreen> {
   List<String> items = [];
   final maxWidth = double.infinity;
   final flex = 8;
-  late double _distanceToField;
-  final _stringTagController = StringTagController();
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _distanceToField = MediaQuery.of(context).size.width;
-  }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _stringTagController = StringTagController();
-  // }
   @override
   void initState() {
     super.initState();
@@ -46,14 +31,17 @@ class _InterestScreenState extends State<InterestScreen> {
   void dispose() {
     super.dispose();
     controller.removeListener(_moveCursorToEnd);
-    _stringTagController.dispose();
   }
 
   void _moveCursorToEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       int textLength = controller.text.length;
-      controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: textLength),
+      // controller.selection = TextSelection.fromPosition(
+      //   TextPosition(offset: textLength),
+      // );
+      controller.selection = TextSelection.collapsed(
+        offset: textLength,
+        affinity: TextAffinity.downstream,
       );
     });
   }
@@ -90,6 +78,11 @@ class _InterestScreenState extends State<InterestScreen> {
                       title: "Back",
                       leftIcon: Icons.arrow_back_ios,
                       rightTitle: 'Save',
+                      onPressRightSide: () {
+                        final data =
+                            ScreenData(message: 'from-interest', items: items);
+                        context.go('/profile', extra: data);
+                      },
                       onPressed: () {
                         GoRouter.of(context).pop();
                       },
@@ -105,61 +98,25 @@ class _InterestScreenState extends State<InterestScreen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     35.0.spaceY,
-                    TextField(
+                    ChipInput(
                         controller: controller,
-                        decoration: InputDecoration(
-                            filled: true,
-                            fillColor: ColorManager.whiteWithOpacity4,
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9.0),
-                                borderSide: BorderSide.none),
-                            prefixIconConstraints: const BoxConstraints(
-                              maxWidth: double.infinity,
-                            ),
-                            prefixIcon: items.isNotEmpty
-                                ? Wrap(
-                                    // direction: Axis.horizontal,
-                                    spacing: 4.0,
-                                    runSpacing: 4.0,
-                                    children: items.map((item) {
-                                      int index = items.indexOf(item);
-                                      return Card(
-                                        color: ColorManager.whiteWithOpacity9,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(4)),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                item,
-                                                style: whiteTextStyle1.copyWith(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(
-                                                Icons.close,
-                                                color: ColorManager.white,
-                                              ),
-                                              onPressed: () =>
-                                                  _removeItem(index),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                                  )
-                                : null),
+                        prefixIcon: items.isNotEmpty
+                            ? Wrap(
+                                direction: Axis.horizontal,
+                                spacing: 4.0,
+                                runSpacing: 4.0,
+                                children: items.map((item) {
+                                  int index = items.indexOf(item);
+                                  return CustomTags(
+                                      title: item,
+                                      onPressed: () => _removeItem(index));
+                                }).toList(),
+                              )
+                            : null,
                         onSubmitted: (value) {
                           _moveCursorToEnd();
-                          _addItem(value);
-                        }),
+                          _addItem(value!);
+                        })
                   ],
                 ),
               ),
@@ -167,4 +124,11 @@ class _InterestScreenState extends State<InterestScreen> {
       ),
     );
   }
+}
+
+class ScreenData {
+  final String message;
+  final List<String> items;
+
+  ScreenData({required this.message, required this.items});
 }
