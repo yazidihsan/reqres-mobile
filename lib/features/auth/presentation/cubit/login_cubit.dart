@@ -1,5 +1,8 @@
-import 'package:bloc/bloc.dart';
+import 'dart:convert';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:reqres/features/auth/domain/entities/auth.dart';
 import 'package:reqres/features/auth/domain/usecases/login.dart';
 import 'package:reqres/utils/shared_pref.dart';
 
@@ -15,15 +18,13 @@ class LoginCubit extends Cubit<LoginState> {
 
   void startLogin(String email, String username, String password) async {
     emit(LoginLoading());
-    // final token = _sharedPref.getAccessToken();
 
     final result = await _login(
         Params(email: email, username: username, password: password));
 
-    result.fold(
-        (l) => emit(LoginFailed(message: l)),
-        (r) =>
-            // await _sharedPref.setAccessToken(r);
-            emit(LoginSuccess(message: r)));
+    result.fold((l) => emit(LoginFailed(message: l)), (r) async {
+      await _sharedPref.setAccessToken(r);
+      emit(LoginSuccess(message: r));
+    });
   }
 }

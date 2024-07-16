@@ -3,12 +3,13 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:reqres/features/auth/data/models/auth_model.dart';
 import 'package:reqres/sl.dart';
 import 'package:reqres/theme_manager/value_manager.dart';
 import 'package:reqres/utils/shared_pref.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<String> register(String email, String username, String password);
+  Future<AuthModel> register(String email, String username, String password);
   Future<String> login(
       String email, String username, String password, String? deviceToken);
 }
@@ -20,6 +21,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<String> login(String email, String username, String password,
       String? deviceToken) async {
+    // Map<String, dynamic> body = {
+    //   'email': email,
+    //   'username': username,
+    //   'password': password,
+    // };
     final response = await client
         .post(Uri.parse('${ValueManager.baseUrl}/api/login'), body: {
       'email': email,
@@ -27,27 +33,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'password': password,
     }, headers: {
       'accept': '*/*',
+      // 'Content-Type': 'application/json',
       'access-control-allow-origin': '*'
     });
 
     final data = jsonDecode(response.body);
-    log('respon login = $data');
+    log('respon status = ${data['message']}');
 
-    if (response.statusCode == 200) {
-      final SharedPref pref = sl<SharedPref>();
-      await pref.setAccessToken(data['access_token']);
-      return data['access_token'];
-    } else if (response.statusCode == 401) {
-      final result = await login(email, username, password, deviceToken);
-
-      return result;
+    if (response.statusCode == 201) {
+      log('data result : ${data['message']}');
+      return data['access_token'] ?? data['message'];
     } else {
-      throw SocketException(data['message']);
+      throw SocketException(data['message'].toString());
     }
   }
 
   @override
-  Future<String> register(
+  Future<AuthModel> register(
       String email, String username, String password) async {
     final response = await client.post(
         Uri.parse('${ValueManager.baseUrl}/api/register'),
@@ -57,8 +59,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final data = jsonDecode(response.body);
     log('respon register = $data');
 
-    if (response.statusCode == 200) {
-      return data['message'];
+    if (response.statusCode == 201) {
+      final result = AuthModel.fromJson(data);
+      return result;
     } else if (response.statusCode == 401) {
       final result = await register(email, username, password);
       return result;

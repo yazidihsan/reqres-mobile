@@ -12,12 +12,12 @@ final class RegisterInitial extends RegisterState {}
 final class RegisterLoading extends RegisterState {}
 
 final class RegisterSuccess extends RegisterState {
-  final String message;
+  final Auth auth;
 
-  const RegisterSuccess({required this.message});
+  const RegisterSuccess({required this.auth});
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [auth];
 }
 
 final class RegisterFailed extends RegisterState {

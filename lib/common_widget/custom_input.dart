@@ -36,6 +36,7 @@ class CustomInput extends StatelessWidget {
           child: TextFormField(
             controller: controller,
             keyboardType: keyboardType,
+            cursorColor: ColorManager.white,
             obscureText: obscureText,
             textInputAction: textInputAction,
             style: whiteTextStyle1.copyWith(fontWeight: FontWeight.w500),

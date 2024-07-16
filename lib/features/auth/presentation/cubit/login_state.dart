@@ -12,6 +12,9 @@ final class LoginInitial extends LoginState {}
 final class LoginLoading extends LoginState {}
 
 final class LoginSuccess extends LoginState {
+  // final Auth auth;
+
+  // const LoginSuccess({required this.auth});
   final String message;
 
   const LoginSuccess({required this.message});

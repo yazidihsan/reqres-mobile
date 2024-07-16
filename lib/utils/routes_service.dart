@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reqres/features/auth/presentation/screen/login_screen.dart';
 import 'package:reqres/features/auth/presentation/screen/register_screen.dart';
+import 'package:reqres/features/main/screen/main_screen.dart';
+import 'package:reqres/features/profile/domain/entities/user.dart';
 import 'package:reqres/features/profile/presentation/interest_screen.dart';
 import 'package:reqres/features/profile/presentation/profile_screen.dart';
 import 'package:reqres/features/splash/presentation/screen/splash_screen.dart';
@@ -50,9 +52,17 @@ class RoutesService {
           name: 'profile',
           pageBuilder: (context, state) => _buildPageWithDefaultTransition(
                   child: ProfileScreen(
-                data: state.extra as ScreenData?,
+                interests: state.extra as List<String>?,
               )),
           routes: [
+            // GoRoute(
+            //     path: 'profile',
+            //     name: 'profile',
+            //     pageBuilder: (context, state) =>
+            //         _buildPageWithDefaultTransition(
+            //             child: ProfileScreen(
+            //           interests: state.extra as List<String>?,
+            //         ))),
             GoRoute(
               path: 'interest',
               name: 'interest',

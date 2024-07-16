@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:reqres/common_widget/custom_bg_page.dart';
 import '../../../../sl.dart';
 import '../../../../theme_manager/asset_manager.dart';
 import '../../../../utils/shared_pref.dart';
@@ -23,21 +26,17 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(
       const Duration(milliseconds: 1500),
       () {
-        goApp();
+        final token = sl<SharedPref>().getAccessToken();
+
+        // log("token : $token");
+
+        if (token != null) {
+          GoRouter.of(context).pushReplacementNamed('profile');
+        } else {
+          GoRouter.of(context).pushReplacementNamed('login');
+        }
       },
     );
-  }
-
-  goApp() async {
-    final pref = sl<SharedPref>();
-    pref.sharedPreferences.reload();
-    final token = sl<SharedPref>().getAccessToken();
-
-    if (token != null) {
-      GoRouter.of(context).goNamed('profile');
-    } else {
-      GoRouter.of(context).goNamed('login');
-    }
   }
 
   @override
@@ -55,22 +54,25 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      AssetManager.iconApp,
-                      width: 120,
-                      height: 150,
-                    ),
-                  ],
+          CustomBackgroundPage(
+            isPrimary: true,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        AssetManager.iconApp,
+                        width: 120,
+                        height: 150,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

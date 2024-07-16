@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:reqres/core/failure/failure.dart';
 import 'package:reqres/core/usecases/usecase.dart';
+import 'package:reqres/features/auth/domain/entities/auth.dart';
 import 'package:reqres/features/auth/domain/repositories/auth_repository.dart';
 
 class Login implements Usecase<String, Params> {

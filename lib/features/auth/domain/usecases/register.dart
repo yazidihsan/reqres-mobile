@@ -1,15 +1,15 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:reqres/core/failure/failure.dart';
 import 'package:reqres/core/usecases/usecase.dart';
+import 'package:reqres/features/auth/domain/entities/auth.dart';
 import 'package:reqres/features/auth/domain/repositories/auth_repository.dart';
 
-class Register implements Usecase<String, Params> {
+class Register implements Usecase<Auth, Params> {
   final AuthRepository repository;
 
   Register(this.repository);
   @override
-  Future<Either<String, String>> call(Params params) async =>
+  Future<Either<String, Auth>> call(Params params) async =>
       // TODO: implement call
       await repository.register(params.email, params.username, params.password);
 }

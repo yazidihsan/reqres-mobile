@@ -212,7 +212,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     }
                                   }
                                   if (state is RegisterSuccess) {
-                                    String message = state.message;
+                                    final data = state.auth;
+                                    String message = data.message;
                                     if (message.isNotEmpty) {
                                       if (message == "User already exists") {
                                         return;

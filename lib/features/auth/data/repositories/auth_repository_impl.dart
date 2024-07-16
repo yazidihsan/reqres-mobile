@@ -5,6 +5,8 @@ import 'package:dartz/dartz.dart';
 import 'package:reqres/core/exception/exception.dart';
 import 'package:reqres/core/failure/failure.dart';
 import 'package:reqres/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:reqres/features/auth/data/models/auth_model.dart';
+import 'package:reqres/features/auth/domain/entities/auth.dart';
 import 'package:reqres/features/auth/domain/repositories/auth_repository.dart';
 import 'package:reqres/sl.dart';
 import 'package:reqres/utils/report_service.dart';
@@ -35,7 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<String, String>> register(
+  Future<Either<String, Auth>> register(
       String email, String username, String password) async {
     // TODO: implement register
     try {

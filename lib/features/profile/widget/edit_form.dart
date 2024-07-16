@@ -13,7 +13,9 @@ class EditForm extends StatefulWidget {
       this.value,
       this.hint,
       this.astroPrediction = false,
-      this.controller});
+      this.controller,
+      this.children,
+      this.keyboardType});
 
   final String label;
   final String selectedInputType;
@@ -24,6 +26,8 @@ class EditForm extends StatefulWidget {
   final String? value;
   final String? hint;
   final bool? astroPrediction;
+  final List<Widget>? children;
+  final TextInputType? keyboardType;
 
   @override
   State<EditForm> createState() => _EditFormState();
@@ -32,19 +36,19 @@ class EditForm extends StatefulWidget {
 class _EditFormState extends State<EditForm> {
   DateTime? selectedDate;
 
-  Future<void> pickDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1950),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
+  // Future<void> pickDate(BuildContext context) async {
+  //   final DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(),
+  //     firstDate: DateTime(1950),
+  //     lastDate: DateTime(2101),
+  //   );
+  //   if (picked != null && picked != selectedDate) {
+  //     setState(() {
+  //       selectedDate = picked;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +81,7 @@ class _EditFormState extends State<EditForm> {
                       textAlign: TextAlign.right,
                       controller: widget.controller,
                       cursorColor: ColorManager.white,
+                      keyboardType: widget.keyboardType,
                       style: widget.astroPrediction == true
                           ? whiteTextStyle7.copyWith(
                               fontSize: 13,
@@ -127,25 +132,27 @@ class _EditFormState extends State<EditForm> {
                       : widget.selectedInputType == 'PickDate'
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  onPressed: () => pickDate(context),
-                                  child: Text(
-                                    selectedDate == null
-                                        ? 'DD MM YYYY'
-                                        : '${selectedDate!.toLocal()}'
-                                            .split(' ')[0],
-                                    style: selectedDate == null
-                                        ? whiteTextStyle7.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 13)
-                                        : whiteTextStyle1.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 13),
-                                  ),
-                                ),
-                              ],
-                            )
+                              children: widget.children!
+                              // [
+
+                              //   TextButton(
+                              //     onPressed: () => pickDate(context),
+                              //     child: Text(
+                              //       selectedDate == null
+                              //           ? 'DD MM YYYY'
+                              //           : '${selectedDate!.toLocal()}'
+                              //               .split(' ')[0],
+                              //       style: selectedDate == null
+                              //           ? whiteTextStyle7.copyWith(
+                              //               fontWeight: FontWeight.w500,
+                              //               fontSize: 13)
+                              //           : whiteTextStyle1.copyWith(
+                              //               fontWeight: FontWeight.w500,
+                              //               fontSize: 13),
+                              //     ),
+                              //   ),
+                              // ],
+                              )
                           : Container(),
             ),
           ),

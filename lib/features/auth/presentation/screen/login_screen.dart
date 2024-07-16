@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image/image.dart';
 import 'package:reqres/common_widget/custom_appbar.dart';
 import 'package:reqres/common_widget/custom_bg_page.dart';
 import 'package:reqres/common_widget/custom_button.dart';
@@ -11,6 +10,7 @@ import 'package:reqres/common_widget/gradient_icon_button.dart';
 import 'package:reqres/features/auth/presentation/cubit/login_cubit.dart';
 import 'package:reqres/features/auth/widget/bottom_text.dart';
 import 'package:reqres/features/auth/widget/title_page.dart';
+import 'package:reqres/features/profile/presentation/cubit/get_user_cubit.dart';
 import 'package:reqres/sl.dart';
 import 'package:reqres/theme_manager/color_manager.dart';
 import 'package:reqres/theme_manager/space_manager.dart';
@@ -24,6 +24,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 final _formKey = GlobalKey<FormState>();
+late TextEditingController _mainController;
 late TextEditingController _emailController;
 late TextEditingController _usernameController;
 late TextEditingController _passwordController;
@@ -36,10 +37,23 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    _mainController = TextEditingController();
     _emailController = TextEditingController();
     _usernameController = TextEditingController();
     _passwordController = TextEditingController();
     _loginCubit = sl<LoginCubit>();
+
+    _mainController.addListener(_updateController);
+  }
+
+  void _updateController() {
+    final text = _mainController.text;
+
+    if (text.contains('@')) {
+      _emailController.value = _mainController.value;
+    } else {
+      _usernameController.value = _mainController.value;
+    }
   }
 
   @override
@@ -47,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _mainController.dispose();
     _loginCubit.close();
     super.dispose();
   }
@@ -55,24 +70,31 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: BlocProvider(
-          create: (context) => _loginCubit,
+        body: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => _loginCubit,
+            )
+          ],
           child: BlocListener<LoginCubit, LoginState>(
             listener: (context, state) {
+              // TODO: implement listener
               if (state is LoginFailed) {
                 String message = state.message;
 
                 if (message.isNotEmpty) {
+                  // message.replaceAll(RegExp('\W+'), '[]');
+                  // for (var item in messages) {
+                  ValueManager.customToast(message);
+                  // }
+                }
+              } else if (state is LoginSuccess) {
+                String message = state.message;
+
+                if (message.contains("Incorrect password")) {
                   ValueManager.customToast(message);
                 } else {
-                  return;
-                }
-              }
-              if (state is LoginSuccess) {
-                final String message = state.message;
-
-                if (message == 'Incorrect password') {
-                  return;
+                  GoRouter.of(context).pushReplacementNamed('profile');
                 }
               }
             },
@@ -95,11 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         25.0.spaceY,
                         CustomInput(
                           hintText: "Enter Username/Email",
-                          controller: _emailController ?? _usernameController,
+                          controller: _mainController,
                           // textInputAction: TextInputAction.next,
-                          keyboardType: _emailController.text.isEmpty
-                              ? TextInputType.text
-                              : TextInputType.emailAddress,
+                          keyboardType: TextInputType.text,
                           obscureText: false,
                           validator: (value) {
                             if (value == null) {
@@ -161,6 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (state is LoginLoading) {
                               return const CustomLoadingButton();
                             }
+
                             return CustomButton(
                                 onPressed: () {
                                   // if (_emailController.text.isEmpty ||
@@ -175,7 +196,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         _usernameController.text,
                                         _passwordController.text);
                                   }
-                                  GoRouter.of(context).goNamed('profile');
                                 },
                                 text: "Login",
                                 textColor: ColorManager.white);
